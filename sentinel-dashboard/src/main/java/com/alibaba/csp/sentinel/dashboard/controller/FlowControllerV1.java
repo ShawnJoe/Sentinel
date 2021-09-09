@@ -149,7 +149,7 @@ public class FlowControllerV1 {
             entity = repository.save(entity);
 
             publishRules(entity.getApp(), entity.getIp(), entity.getPort());
-            publishRules(entity.getApp(), entity.getIp(), entity.getPort());
+//            publishRules(entity.getApp(), entity.getIp(), entity.getPort());
             return Result.ofSuccess(entity);
         } catch (Throwable t) {
             Throwable e = t instanceof ExecutionException ? t.getCause() : t;
