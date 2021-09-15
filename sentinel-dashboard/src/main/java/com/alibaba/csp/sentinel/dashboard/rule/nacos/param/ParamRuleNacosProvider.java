@@ -24,8 +24,9 @@ public class ParamRuleNacosProvider implements DynamicRuleProvider<List<ParamFlo
 
     @Autowired
     private ConfigService configService;
+
     @Resource
-    private Converter<String, List<ParamFlowRuleEntity>> degradeRuleEntityDecoder;
+    private Converter<String, List<ParamFlowRuleEntity>> paramRuleEntityDecoder;
 
     @Override
     public List<ParamFlowRuleEntity> getRules(String appName) throws Exception {
@@ -34,6 +35,6 @@ public class ParamRuleNacosProvider implements DynamicRuleProvider<List<ParamFlo
         if (StringUtil.isEmpty(rules)) {
             return new ArrayList<>();
         }
-        return degradeRuleEntityDecoder.convert(rules);
+        return paramRuleEntityDecoder.convert(rules);
     }
 }
