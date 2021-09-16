@@ -1,9 +1,9 @@
 package com.alibaba.csp.sentinel.dashboard.rule.nacos.param;
 
-import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.ParamFlowRuleEntity;
 import com.alibaba.csp.sentinel.dashboard.rule.DynamicRulePublisher;
 import com.alibaba.csp.sentinel.dashboard.rule.nacos.NacosConfigUtil;
 import com.alibaba.csp.sentinel.datasource.Converter;
+import com.alibaba.csp.sentinel.slots.block.flow.param.ParamFlowRule;
 import com.alibaba.csp.sentinel.util.AssertUtil;
 import com.alibaba.nacos.api.config.ConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,15 +19,15 @@ import java.util.List;
  */
 
 @Component("paramRuleNacosPublisher")
-public class ParamRuleNacosPublisher implements DynamicRulePublisher<List<ParamFlowRuleEntity>> {
+public class ParamRuleNacosPublisher implements DynamicRulePublisher<List<ParamFlowRule>> {
 
     @Autowired
     private ConfigService configService;
 
     @Resource
-    private Converter<List<ParamFlowRuleEntity>, String> paramFlowRuleEntityEncoder;
+    private Converter<List<ParamFlowRule>, String> paramFlowRuleEntityEncoder;
     @Override
-    public void publish(String appName, List<ParamFlowRuleEntity> rules) throws Exception {
+    public void publish(String appName, List<ParamFlowRule> rules) throws Exception {
         AssertUtil.notEmpty(appName, "app name cannot be empty");
         if (rules == null) {
             return;

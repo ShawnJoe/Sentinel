@@ -15,8 +15,12 @@
  */
 package com.alibaba.csp.sentinel.dashboard.rule.nacos;
 
-import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.*;
+import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.DegradeRuleEntity;
+import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.FlowRuleEntity;
+import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.SystemRuleEntity;
 import com.alibaba.csp.sentinel.datasource.Converter;
+import com.alibaba.csp.sentinel.slots.block.authority.AuthorityRule;
+import com.alibaba.csp.sentinel.slots.block.flow.param.ParamFlowRule;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.config.ConfigFactory;
@@ -52,7 +56,7 @@ public class NacosConfig {
     }
 
     @Bean
-    public Converter<List<AuthorityRuleEntity>, String> authorityRuleEntityEncoder() {
+    public Converter<List<AuthorityRule>, String> authorityRuleEntityEncoder() {
         return JSON::toJSONString;
     }
 
@@ -62,7 +66,7 @@ public class NacosConfig {
     }
 
     @Bean
-    public Converter<List<ParamFlowRuleEntity>, String> paramFlowRuleEntityEncoder() {
+    public Converter<List<ParamFlowRule>, String> paramFlowRuleEntityEncoder() {
         return JSON::toJSONString;
     }
 
@@ -76,16 +80,16 @@ public class NacosConfig {
         return s -> JSON.parseArray(s, FlowRuleEntity.class);
     }
     @Bean
-    public Converter<String, List<AuthorityRuleEntity>> authorityRuleEntityDecoder() {
-        return s -> JSON.parseArray(s, AuthorityRuleEntity.class);
+    public Converter<String, List<AuthorityRule>> authorityRuleEntityDecoder() {
+        return s -> JSON.parseArray(s, AuthorityRule.class);
     }
     @Bean
     public Converter<String, List<DegradeRuleEntity>> degradeRuleEntityDecoder() {
         return s -> JSON.parseArray(s, DegradeRuleEntity.class);
     }
     @Bean
-    public Converter<String, List<ParamFlowRuleEntity>> paramRuleEntityDecoder() {
-        return s -> JSON.parseArray(s, ParamFlowRuleEntity.class);
+    public Converter<String, List<ParamFlowRule>> paramRuleEntityDecoder() {
+        return s -> JSON.parseArray(s, ParamFlowRule.class);
     }
     @Bean
     public Converter<String, List<SystemRuleEntity>> systemRuleEntityDecoder() {

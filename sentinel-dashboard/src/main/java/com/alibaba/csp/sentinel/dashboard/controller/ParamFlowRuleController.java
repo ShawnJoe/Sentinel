@@ -29,6 +29,7 @@ import com.alibaba.csp.sentinel.dashboard.rule.DynamicRuleProvider;
 import com.alibaba.csp.sentinel.dashboard.rule.DynamicRulePublisher;
 import com.alibaba.csp.sentinel.dashboard.util.VersionUtils;
 import com.alibaba.csp.sentinel.slots.block.RuleConstant;
+import com.alibaba.csp.sentinel.slots.block.flow.param.ParamFlowRule;
 import com.alibaba.csp.sentinel.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 /**
  * @author Eric Zhao
@@ -60,10 +62,10 @@ public class ParamFlowRuleController {
 
     @Autowired
     @Qualifier("paramRuleNacosProvider")
-    private DynamicRuleProvider<List<ParamFlowRuleEntity>> ruleProvider;
+    private DynamicRuleProvider<List<ParamFlowRule>> ruleProvider;
     @Autowired
     @Qualifier("paramRuleNacosPublisher")
-    private DynamicRulePublisher<List<ParamFlowRuleEntity>> rulePublisher;
+    private DynamicRulePublisher<List<ParamFlowRule>> rulePublisher;
 
     private boolean checkIfSupported(String app, String ip, int port) {
         try {
@@ -96,8 +98,12 @@ public class ParamFlowRuleController {
             return unsupportedVersion();
         }
         try {
-            List<ParamFlowRuleEntity> rules = ruleProvider.getRules(app);
-            List<ParamFlowRuleEntity> paramFlowRuleEntities = repository.saveAll(rules);
+            List<ParamFlowRule> rules = ruleProvider.getRules(app);
+            List<ParamFlowRuleEntity> authorityRuleEntities = Optional.ofNullable(rules).map(r -> r.stream()
+                    .map(e -> ParamFlowRuleEntity.fromParamFlowRule(app, ip, port, e))
+                    .collect(Collectors.toList())
+            ).orElse(null);
+            List<ParamFlowRuleEntity> paramFlowRuleEntities = repository.saveAll(authorityRuleEntities);
             return Result.ofSuccess(paramFlowRuleEntities);
 //            return sentinelApiClient.fetchParamFlowRulesOfMachine(app, ip, port)
 //                .thenApply(repository::saveAll)
@@ -263,7 +269,9 @@ public class ParamFlowRuleController {
 //        return sentinelApiClient.setParamFlowRuleOfMachine(app, ip, port, rules);
 //    }
     private void publishRules(String app, String ip, Integer port) throws Exception {
-        List<ParamFlowRuleEntity> rules = repository.findAllByMachine(MachineInfo.of(app, ip, port));
+        List<ParamFlowRuleEntity> ruleEntity = repository.findAllByMachine(MachineInfo.of(app, ip, port));
+        List<ParamFlowRule> rules = ruleEntity.stream().map(r -> r.toRule()).collect(Collectors.toList());
+
         rulePublisher.publish(app, rules);
 //        return sentinelApiClient.setParamFlowRuleOfMachine(app, ip, port, rules);
     }
